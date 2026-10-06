@@ -1,0 +1,48 @@
+name: Daily Development Log
+
+on:
+  schedule:
+    - cron: "30 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-daily-log:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update activity log
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p daily
+          today="$(date -u +'%Y-%m-%d')"
+
+          if grep -q "^\\- ${today} " daily/activity.md 2>/dev/null; then
+            echo "Entry for ${today} already exists."
+            exit 0
+          fi
+
+          printf '\\n- %s — Automated daily development log update.\\n' "$today" >> daily/activity.md
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add daily/activity.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: update daily activity log"
+          git push
