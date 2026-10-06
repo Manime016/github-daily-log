@@ -1,17 +1,30 @@
-# GitHub Daily Log
+# GitHub Daily Python Automation
 
-A standalone project that records daily development activity through GitHub Actions.
+A standalone Python automation project that runs through GitHub Actions and records a small, reproducible activity dataset.
 
-The repository is isolated from my other projects. The workflow updates `daily/activity.md` once per day and commits the change automatically.
+## What it demonstrates
 
-## Purpose
-
-This demonstrates:
-- GitHub Actions scheduling
-- Automated file updates
+- Python 3.12
+- Python modules and type hints
+- JSON data processing
+- Unit testing with the standard library
+- GitHub Actions automation
 - Automated Git commits
-- A simple reproducible maintenance workflow
 
-## Schedule
+## Project structure
 
-The workflow runs daily at a fixed UTC time and can also be triggered manually from the Actions tab.
+```text
+src/
+  activity_logger.py
+  metrics.py
+tests/
+  test_metrics.py
+daily/
+  activity.json
+.github/workflows/
+  daily-commit.yml
+```
+
+The scheduled workflow runs once per day, executes the Python tests, generates the day's record, and commits the updated JSON dataset when a new record is needed.
+
+No third-party Python packages are required.
