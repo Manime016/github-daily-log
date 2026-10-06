@@ -1,4 +1,4 @@
-name: Daily Development Log
+name: Daily Python Automation
 
 on:
   schedule:
@@ -9,40 +9,32 @@ permissions:
   contents: write
 
 jobs:
-  update-daily-log:
+  daily-python-update:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update activity log
-        shell: bash
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Python tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Generate daily Python activity
+        run: python src/activity_logger.py
+
+      - name: Commit generated activity
         run: |
-          set -euo pipefail
-          mkdir -p daily
-          today="$(date -u +'%Y-%m-%d')"
-
-          if grep -q "^\\- ${today} " daily/activity.md 2>/dev/null; then
-            echo "Entry for ${today} already exists."
-            exit 0
-          fi
-
-          printf '\\n- %s — Automated daily development log update.\\n' "$today" >> daily/activity.md
-
-      - name: Commit and push
-        shell: bash
-        run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add daily/activity.md
-
+          git add daily/activity.json
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No new daily record."
             exit 0
           fi
-
-          git commit -m "chore: update daily activity log"
+          git commit -m "chore: record daily Python automation"
           git push
