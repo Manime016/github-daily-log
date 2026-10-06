@@ -1,0 +1,1 @@
+"""Daily Python automation package."""
